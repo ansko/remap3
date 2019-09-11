@@ -16,7 +16,10 @@ special_bonds       lj/coul 1 1 1
 neighbor            5 bin
 neigh_modify        delay 0 every 1 check no page 50000000 one 5000000
 
+
 read_data           meso.data
+#read_restart        dpd_r.22000.restart
+
 
 # dpd:              T cutoff seed
 # coul/cut/soft:    n alpha_C cutoff
@@ -26,23 +29,24 @@ pair_style          hybrid/overlay dpd 1 1 34387 &
                                    lj/cut/soft 2 1 5
 
 # coul/cut/soft: lambda
-pair_coeff          1 2 coul/cut/soft 0.001
+pair_coeff          1 1 coul/cut/soft 0.25
+pair_coeff          1 2 coul/cut/soft 0.5
 
 # lj/cut/soft:   epsilon sigma lambda cutoff1 cutoff2
-pair_coeff          3 4 lj/cut/soft 0.05275 10 3 3
-pair_coeff          4 4 lj/cut/soft 0.09150 10 3 3
+pair_coeff          3 4 lj/cut/soft 0.07    10 3 3
+pair_coeff          4 4 lj/cut/soft 0.85    10 3 3
 
 # dpd:           a gamma cutoff
-pair_coeff          1 1 dpd 500 5 0.95
+pair_coeff          1 1 dpd 50000 5 0.99
 pair_coeff          1 2 dpd 500 5 0.8
 pair_coeff          1 3 dpd 500 5 0.8
 pair_coeff          1 4 dpd 500 5 0.8
-pair_coeff          2 2 dpd 50  5 0.8
-pair_coeff          2 3 dpd 50  5 0.8
-pair_coeff          2 4 dpd 150  5 0.8
-pair_coeff          3 3 dpd 50  5 1
-pair_coeff          3 4 dpd 150  5 1
-pair_coeff          4 4 dpd 150  5 1
+pair_coeff          2 2 dpd 25   5 0.8
+pair_coeff          2 3 dpd 25   5 0.8
+pair_coeff          2 4 dpd 300  5 0.8
+pair_coeff          3 3 dpd 25   5 1
+pair_coeff          3 4 dpd 250  5 1
+pair_coeff          4 4 dpd 800  5 1
 
 
 mass * 1
@@ -106,6 +110,16 @@ dump                d0 fordump image 100 dumps/mmt.*.jpg type type view 90 0
 
 timestep            0.01
 
-run                 100000
+
+
+label loop
+variable a loop 5
+    run 5000 start 0 stop 25000
+    write_data dpd_d.*.data
+    write_restart dpd_r.*.restart
+    next a
+jump SELF loop
+
+
 
 unfix 1
